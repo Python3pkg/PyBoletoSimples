@@ -4,7 +4,7 @@ import time
 import requests
 import json
 
-from utils import JSONEncoder, cc_to_
+from .utils import JSONEncoder, cc_to_
 
 CONNECT_TIMEOUT, READ_TIMEOUT = 5.0, 30.0
 
@@ -23,7 +23,7 @@ class BoletoSimplesBase(object):
             return resposta.json()
         if resposta.status_code == 429:
             if 'Retry-After' in resposta.headers:
-                time.sleep(long(resposta.headers['Retry-After']))
+                time.sleep(int(resposta.headers['Retry-After']))
                 return self.show(object_id, **kwargs)
         self._raise_error(resposta)
 
@@ -152,14 +152,14 @@ class BoletoSimplesBase(object):
                     mensagem = objeto['error']
                 else:
                     if 'errors' in objeto:
-                        items = objeto['errors'].items()
+                        items = list(objeto['errors'].items())
                     else:
-                        items = objeto.items()
+                        items = list(objeto.items())
                     lista = list()
                     for campo, erros in items:
-                        erro = u'%s: %s' % (campo, u", ".join(erros))
+                        erro = '%s: %s' % (campo, ", ".join(erros))
                         lista.append(erro)
-                        mensagem = u", ".join(lista)
+                        mensagem = ", ".join(lista)
             except:
                 mensagem = resposta.text
             raise Exception(mensagem.encode('utf-8'))
